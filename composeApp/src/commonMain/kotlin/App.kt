@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import data.BirdImage
+import data.Book
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import io.kamel.image.KamelImage
@@ -43,7 +43,7 @@ fun App() {
         val birdsViewModel = getViewModel(Unit, viewModelFactory { BirdsViewModel() })
         val uiState by birdsViewModel.uiState.collectAsState()
         LaunchedEffect(birdsViewModel) {
-            birdsViewModel.updateImages()
+            birdsViewModel.updateBooks()
         }
 
         BirdsPage(uiState, onSelectCategory = { birdsViewModel.selectCategory(it) })
@@ -51,7 +51,7 @@ fun App() {
 }
 
 @Composable
-fun BirdsPage(uiState: BirdsUiState, onSelectCategory: (String) -> Unit) {
+fun BirdsPage(uiState: BooksUiState, onSelectCategory: (String) -> Unit) {
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -71,15 +71,15 @@ fun BirdsPage(uiState: BirdsUiState, onSelectCategory: (String) -> Unit) {
             }
         }
 
-        AnimatedVisibility(visible = uiState.selectedImages.isNotEmpty()) {
+        AnimatedVisibility(visible = uiState.books.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(180.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp),
                 modifier = Modifier.fillMaxSize().padding(horizontal = 5.dp),
             ) {
-                items(uiState.selectedImages) { image ->
-                    BirdImageCell(image)
+                items(uiState.books) { book ->
+                    BirdImageCell(book)
                 }
             }
         }
@@ -87,11 +87,11 @@ fun BirdsPage(uiState: BirdsUiState, onSelectCategory: (String) -> Unit) {
 }
 
 @Composable
-fun BirdImageCell(image: BirdImage) {
+fun BirdImageCell(book: Book) {
     KamelImage(
-        resource = asyncPainterResource("https://sebastianaigner.github.io/demo-image-api/${image.path}"),
-        contentDescription = "${image.category} by ${image.author}",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().aspectRatio(1.0f),
+        resource = asyncPainterResource(book.img),
+        contentDescription = "${book.category} by ${book.author}",
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier.fillMaxWidth(),
     )
 }
